@@ -15,7 +15,7 @@ Thread leituraSensor2;
 int pinoledAzul = 5; //Pino ligado ao led Azul
 int pinoledverm = 2; //Pino ligado ao led vermelho
 int pinopir = 3;  //Pino ligado ao sensor presença  PIR
-int acionamento;  //Variavel para guardar valor do sensor
+int acionamento = 0;  //Variavel para guardar valor do sensor , inicia com 0.
 
 //=== INICIALIZANDO  == SENSOR ULTRASONICO PARA MEDIR DISTÂNCIA
 //Define os pinos do Arduino ligados ao Trigger e Echo
@@ -53,9 +53,9 @@ void lerDistancia()
   
     //Mostra os valores na serial
     Serial.print("Centimetros: ");
-    Serial.print(cmMsec);
+    Serial.print(cmMsec); //previsão da criança deitada ou o berço vazio a medida será entre 90cm e 70 cm
 
-    if (cmMsec>50.00)  
+    if (cmMsec>70.00)  
         {
         digitalWrite(pinoledAzul, LOW);
         }
@@ -63,11 +63,12 @@ void lerDistancia()
         {
         digitalWrite(pinoledAzul, HIGH);
         }
+
     }
 
   
-   //Aguarda 1 segundo e reinicia o processo
-   delay(1000);
+   //Aguarda 0,5 segundo e reinicia o processo
+   delay(500);
 }
 
 void lerPresenca()
@@ -78,7 +79,7 @@ void lerPresenca()
     Serial.print(" = SENSOR : "); 
     Serial.println(acionamento);  
 
-    if (acionamento == LOW)  //Sem movimento, mantem led vermelho apagado
+    if (acionamento == 0)  //Sem movimento, mantem led vermelho apagado
         {
         digitalWrite(pinoledverm, LOW);
         }
