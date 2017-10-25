@@ -1,5 +1,6 @@
 // Programa : EXPERIMENTO TEMPO REAL 
 // Autor : WALNER DE OLIVEIRA
+// 24/10/2017
 
 #include "Thread.h"
 #include "ThreadController.h"
