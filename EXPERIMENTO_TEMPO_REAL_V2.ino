@@ -2,9 +2,19 @@
 // Autor : WALNER DE OLIVEIRA
 // 24/10/2017
 
+#include <StaticThreadController.h>
+#include <Thread.h>
+#include <ThreadController.h>
+
+// Programa : EXPERIMENTO TEMPO REAL 
+// Autor : WALNER DE OLIVEIRA
+// 24/10/2017
+
 #include "Thread.h"
 #include "ThreadController.h"
 #include "Ultrasonic.h"
+#include <Ultrasonic.h>
+
 
 //Processos para controle de Ambinte de berço
 ThreadController cpu;
@@ -12,9 +22,10 @@ Thread leituraSensor1;
 Thread leituraSensor2;
 
 //Portas para os sensores
-int pinoledAzul = 5; //Pino ligado ao led Azul
+//int pinoledAzul = 5; //Pino ligado ao led Azul
 int pinoledverm = 2; //Pino ligado ao led vermelho
-int pinopir = 3;  //Pino ligado ao sensor presença  PIR
+int pinSensorPIR = 9; //Pino ligado ao sensor presença  PIR
+int valorSensorPIR = 0;
 int acionamento = 0;  //Variavel para guardar valor do sensor , inicia com 0.
 
 //=== INICIALIZANDO  == SENSOR ULTRASONICO PARA MEDIR DISTÂNCIA
@@ -24,19 +35,21 @@ int acionamento = 0;  //Variavel para guardar valor do sensor , inicia com 0.
 
 //Inicializa o sensor ultrasonico nos pinos especificados
 Ultrasonic ultrasonic(PINO_TRG, PINO_ECHO);
-void setup()
+
+void inicializar()
 {
 //Inicializa a serial
   Serial.begin(9600);
+    pinMode(pinSensorPIR,INPUT);//Define pino sensor presença pir como entrada
 }
 
 
 
 //===INICIALIZANDO == SENSOR PRESENÇA PIR
-void setup(){
-  pinMode(pinopir, INPUT);   //Define pino sensor presença pir como entrada
+//void setup(){
+ // pinMode(pinopir, INPUT);   //Define pino sensor presença pir como entrada
  // Serial.begin(9600);
-}
+//}
 
 //Funcoes
 
@@ -55,16 +68,18 @@ void lerDistancia()
     Serial.print("Centimetros: ");
     Serial.print(cmMsec); //previsão da criança deitada ou o berço vazio a medida será entre 90cm e 70 cm
 
-    if (cmMsec>70.00)  
+    if (cmMsec>20.00)  
         {
-        digitalWrite(pinoledAzul, LOW);
+          Serial.println("              desligar led azul              ");
+        //digitalWrite(pinoledAzul, LOW);
         }
     else  //Caso seja detectado posição de não dormindo, aciona o led azul
         {
-        digitalWrite(pinoledAzul, HIGH);
+          Serial.println(" ------------LIGAR LED AZUL ------------- ");
+        //digitalWrite(pinoledAzul, HIGH);
         }
 
-    }
+    
 
   
    //Aguarda 0,5 segundo e reinicia o processo
@@ -73,22 +88,27 @@ void lerDistancia()
 
 void lerPresenca()
 {
-    acionamento = digitalRead(pinopir); //Le o valor do sensor PIR
- 
-    // Mostra o valor lido do PIR no monitor serial  
-    Serial.print(" = SENSOR : "); 
-    Serial.println(acionamento);  
+  //Lendo o valor do sensor PIR. Este sensor pode assumir 2 valores
+  //1 quando detecta algum movimento e 0 quando não detecta.
+  valorSensorPIR = digitalRead(pinSensorPIR);
+   
+  Serial.print("Valor do Sensor PIR: ");  
+  Serial.println(valorSensorPIR);
+   
+  //Verificando se ocorreu detecção de movimentos
+  if (valorSensorPIR == 1) {//Sem movimento, mantem led vermelho apagado
+   // ligarAlarme();
+  Serial.println(" ++++++++++++LIGAR LED VERMELHO ++++++++++++ ");  
+       //   digitalWrite(pinoledverm, LOW);
 
-    if (acionamento == 0)  //Sem movimento, mantem led vermelho apagado
-        {
-        digitalWrite(pinoledverm, LOW);
-        }
-    else  //Caso seja detectado um movimento, aciona o led vermelho ligado
-        {
-        digitalWrite(pinoledverm, HIGH);
-        }
-    }
 
+  } else { //Caso seja detectado um movimento, aciona o led vermelho ligado
+   // desligarAlarme();
+     Serial.println("              desligar led vermelho              ");  
+     //  digitalWrite(pinoledverm, HIGH);
+  }   
+
+} 
 
 //Funcoes principais
 void setup(){
